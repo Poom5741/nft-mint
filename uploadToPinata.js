@@ -33,6 +33,7 @@ async function uploadFileToPinata(filePath) {
     return response.data.IpfsHash;
   } catch (error) {
     console.error(`Error uploading file ${filePath} to Pinata:`, error);
+    throw new Error("File upload failed");
   }
 }
 
@@ -52,43 +53,38 @@ async function uploadMetadataToPinata(metadata) {
       "Metadata successfully uploaded to IPFS! IPFS Hash:",
       response.data.IpfsHash
     );
-    return response.data.IpfsHash;
+    return `ipfs://${response.data.IpfsHash}`;
   } catch (error) {
     console.error("Error uploading metadata to Pinata:", error);
+    throw new Error("Metadata upload failed");
   }
 }
 
-// Main function to upload multiple files and their metadata
-async function main() {
-  for (let i = 1; i <= 10; i++) {
-    const filePath = `./photo/${i}.png`; // File path for each image (1.png to 10.png)
-
-    // Upload the file to Pinata and get the file's IPFS hash
+// Function to handle the entire NFT upload (both file and metadata)
+async function uploadNFT(filePath, nftMetadata) {
+  try {
+    // Step 1: Upload the image to Pinata and get the IPFS hash
     const fileHash = await uploadFileToPinata(filePath);
+    console.log(`File uploaded. IPFS Hash: ipfs://${fileHash}`);
 
-    if (fileHash) {
-      // Create metadata for each NFT
-      const metadata = {
-        name: `My Cool NFT ${i}`,
-        description: `This is an amazing piece of digital art for NFT ${i}`,
-        image: `ipfs://${fileHash}`, // Use the file hash in metadata
-        attributes: [
-          {
-            trait_type: "Background",
-            value: "Blue",
-          },
-          {
-            trait_type: "Eyes",
-            value: "Green",
-          },
-        ],
-      };
+    // Step 2: Create metadata and set the image URI to the uploaded file
+    const metadata = {
+      ...nftMetadata, // Spread metadata passed from the MintNFT component
+      image: `ipfs://${fileHash}`, // Attach the image IPFS hash to the metadata
+    };
 
-      // Upload the metadata to Pinata
-      await uploadMetadataToPinata(metadata);
-    }
+    // Step 3: Upload the metadata to Pinata and get the IPFS hash
+    const metadataURI = await uploadMetadataToPinata(metadata);
+
+    // Step 4: Return the IPFS URI of the metadata for minting
+    return metadataURI;
+  } catch (error) {
+    console.error("Error during NFT upload process:", error);
+    throw new Error("NFT upload failed");
   }
 }
 
-// Execute the main function
-main();
+// Export the upload function to be used in the MintNFT component
+module.exports = {
+  uploadNFT,
+};
