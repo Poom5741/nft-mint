@@ -14,6 +14,9 @@ const nextConfig = {
     config.externals.push("pino-pretty", "lokijs", "encoding");
     return config;
   },
+  images: {
+    domains: ["tomato-academic-dragon-340.mypinata.cloud"], // Add the IPFS domain or any other external image source you're using
+  },
 };
 
 module.exports = nextConfig;
