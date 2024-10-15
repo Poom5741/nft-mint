@@ -14,7 +14,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const externalContracts = {
   11155111: {
     NFTMint: {
-      address: "0xd8Ed99b2f1907f086793d843309325BD67dc4d7C",
+      address: "0xbBd7171bB1f5156aCeA6DDe8fCE32E6f474bb94b",
       abi: [
         { inputs: [], stateMutability: "nonpayable", type: "constructor" },
         {
