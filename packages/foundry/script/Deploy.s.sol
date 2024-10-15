@@ -1,16 +1,16 @@
-//SPDX-License-Identifier: MIT
-pragma solidity ^0.8.19;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
 
-import "./DeployHelpers.s.sol";
-import { DeployYourContract } from "./DeployYourContract.s.sol";
+import "forge-std/Script.sol";
+import "../contracts/NFTMint.sol";
 
-contract DeployScript is ScaffoldETHDeploy {
-  function run() external {
-    DeployYourContract deployYourContract = new DeployYourContract();
-    deployYourContract.run();
+contract DeployNFTMint is Script {
+    function run() external {
+        vm.startBroadcast();
 
-    // deploy more contracts here
-    // DeployMyContract deployMyContract = new DeployMyContract();
-    // deployMyContract.run();
-  }
+        NFTMint nftMint = new NFTMint();
+        console.log("NFTMint deployed at:", address(nftMint));
+
+        vm.stopBroadcast();
+    }
 }
