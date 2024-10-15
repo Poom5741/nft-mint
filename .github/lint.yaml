@@ -1,0 +1,4 @@
+- name: Check for changes
+  run: |
+    git diff --exit-code || git commit -am "Auto-update"
+    git push

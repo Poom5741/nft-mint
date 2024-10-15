@@ -1,55 +1,59 @@
-import { useState } from "react";
-// Import the uploadNFT function from the updated script
-import { uploadNFT } from "../../../uploadToPinata";
+import { useEffect, useState } from "react";
+import ipfsMetadataURIs from "./../metadataURIs";
 import { parseEther } from "viem";
 import { useAccount } from "wagmi";
 import { Address, Balance } from "~~/components/scaffold-eth";
-import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
+import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
+
+// Adjust the path as needed
 
 export const MintNFT = () => {
   const { address: connectedAddress } = useAccount();
   const [isMinting, setIsMinting] = useState(false);
+  const [nextTokenId, setNextTokenId] = useState(0); // Next available token ID to mint
+  const [metadataURI, setMetadataURI] = useState(""); // Metadata URI for the next NFT
 
-  // Hook for writing to the smart contract (assumed contract name is "NFTMint")
-  const { writeContractAsync } = useScaffoldWriteContract("NFTMint");
+  // Hook for reading the current token ID from the smart contract
+  const { data: currentTokenId } = useScaffoldReadContract({
+    contractName: "NFTMint",
+    functionName: "currentTokenId", // Assumes the smart contract has a public `currentTokenId` function
+  });
 
-  // Auto-generate metadata and mint NFT
-  const handleAutoMintNFT = async () => {
+  // Hook for writing to the smart contract
+  const { writeContractAsync, isPending } = useScaffoldWriteContract("NFTMint");
+
+  // Effect to update the next token ID and corresponding metadata URI
+  useEffect(() => {
+    if (currentTokenId !== undefined && currentTokenId < ipfsMetadataURIs.length) {
+      setNextTokenId(Number(currentTokenId) + 1); // Next token ID to mint
+      setMetadataURI(ipfsMetadataURIs[Number(currentTokenId)]); // Corresponding metadata URI
+    }
+  }, [currentTokenId]);
+
+  // Mint NFT with the next available metadata URI
+  const handleMintNFT = async () => {
+    if (nextTokenId >= ipfsMetadataURIs.length) {
+      alert("All NFTs have been minted!");
+      return;
+    }
+
     setIsMinting(true);
 
     try {
-      // Step 1: Define NFT metadata (auto-generated)
-      const nftMetadata = {
-        name: `NFT #${Date.now()}`, // Unique name based on timestamp
-        description: "This is an auto-generated NFT with metadata uploaded to IPFS.",
-        attributes: [
-          {
-            trait_type: "Coolness",
-            value: "Super Cool",
-          },
-        ],
-      };
+      console.log("Minting NFT with Metadata URI:", metadataURI);
 
-      // Step 2: Upload the image and metadata to Pinata
-      const filePath = `./photo/1.png`; // Example image file
-      const tokenURI = await uploadNFT(filePath, nftMetadata);
-      console.log("Metadata uploaded. IPFS URI:", tokenURI);
+      // Call the mintNFT function with the IPFS metadata URI
+      const result = await writeContractAsync({
+        functionName: "mintNFT",
+        args: [metadataURI], // Pass the IPFS metadata URI
+        value: parseEther("0.01"), // Mint price (0.01 ETH)
+      });
 
-      // Step 3: Call the mintNFT function with the IPFS metadata URI
-      await writeContractAsync(
-        {
-          functionName: "mintNFT",
-          args: [tokenURI], // Pass the IPFS metadata URI
-          value: parseEther("0.01"), // Mint price (0.01 ETH)
-        },
-        {
-          onBlockConfirmation: txnReceipt => {
-            console.log("📦 Transaction blockHash", txnReceipt.blockHash);
-          },
-        },
-      );
+      console.log("Transaction result:", result);
 
-      console.log("NFT Minted successfully!");
+      if (result) {
+        console.log("Transaction sent! Waiting for confirmation...");
+      }
     } catch (e) {
       console.error("Error minting NFT", e);
     } finally {
@@ -70,9 +74,15 @@ export const MintNFT = () => {
         Balance: <Balance address={connectedAddress} />
       </div>
 
-      {/* Button to trigger the automated minting process */}
-      <button className="btn btn-primary" onClick={handleAutoMintNFT} disabled={isMinting}>
-        {isMinting ? <span className="loading loading-spinner loading-sm"></span> : "Auto Mint NFT"}
+      {/* Display information about the next NFT to be minted */}
+      <div className="text-sm mb-4">
+        <p>Next available NFT: #{nextTokenId}</p>
+        <p>Metadata URI: {metadataURI}</p>
+      </div>
+
+      {/* Button to trigger the minting process */}
+      <button className="btn btn-primary" onClick={handleMintNFT} disabled={isMinting || isPending}>
+        {isMinting || isPending ? <span className="loading loading-spinner loading-sm"></span> : "Mint NFT"}
       </button>
     </div>
   );
