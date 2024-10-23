@@ -15,7 +15,13 @@ const nextConfig = {
     return config;
   },
   images: {
-    domains: ["tomato-academic-dragon-340.mypinata.cloud"], // Add the IPFS domain or any other external image source you're using
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "tomato-academic-dragon-340.mypinata.cloud",
+        pathname: "/ipfs/**",
+      },
+    ],
   },
 };
 

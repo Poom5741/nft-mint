@@ -3,13 +3,13 @@ import ipfsMetadataURIs from "./../metadataURIs";
 import { MintPreviewCard } from "./MintPreviewCard";
 import { parseEther } from "viem";
 import { useAccount } from "wagmi";
-import { Address, Balance } from "~~/components/scaffold-eth";
+import { RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
 import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 
-// Import the MintPreviewCard
+// Import only the connect wallet button
 
 export const MintNFT = () => {
-  const { address: connectedAddress } = useAccount();
+  const { isConnected } = useAccount();
   const [isMinting, setIsMinting] = useState(false);
   const [nextTokenId, setNextTokenId] = useState(0); // Next available token ID to mint
   const [metadataURI, setMetadataURI] = useState(""); // Metadata URI for the next NFT
@@ -67,19 +67,16 @@ export const MintNFT = () => {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row justify-center items-start gap-8 p-8 h-full">
+    <div className="flex flex-col justify-center items-start gap-8 p-8 h-full">
       {/* Minting Card */}
-      <div className="bg-base-300 p-6 rounded-lg w-full lg:w-1/2 h-full flex-grow flex flex-col justify-between">
+      <div className="bg-base-300 p-6 rounded-lg w-full lg:w-[400px] h-full flex-grow flex flex-col justify-between">
         <div>
-          <h2 className="text-lg font-bold mb-2">Mint Your NFTs</h2>
-
-          {/* Show connected wallet address and balance */}
-          <div className="text-sm font-semibold mb-2">
-            Address: <Address address={connectedAddress} />
-          </div>
-
-          <div className="text-sm font-semibold mb-4">
-            Balance: <Balance address={connectedAddress} />
+          {/* Align Connect Wallet button and Mint title */}
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-bold">Mint Your NFTs</h2>
+            <div className="w-auto">
+              <RainbowKitCustomConnectButton />
+            </div>
           </div>
 
           {/* Display information about the next NFT to be minted */}
@@ -95,7 +92,7 @@ export const MintNFT = () => {
               max={10}
               value={mintAmount}
               className="range range-primary"
-              step={1} // Increments of 1
+              step={1}
               onChange={e => setMintAmount(Number(e.target.value))}
             />
             <input
@@ -113,14 +110,14 @@ export const MintNFT = () => {
         <button
           className={`btn btn-primary mt-4 w-full ${isMinting || isPending ? "loading" : ""}`}
           onClick={handleMintNFT}
-          disabled={isMinting || isPending}
+          disabled={isMinting || isPending || !isConnected}
         >
           {isMinting || isPending ? "Minting..." : `Mint ${mintAmount} NFT${mintAmount > 1 ? "s" : ""}`}
         </button>
       </div>
 
       {/* Mint Preview Card */}
-      <div className="h-full flex-grow">
+      <div className="mt-6">
         <MintPreviewCard tokenId={nextTokenId} metadataURI={metadataURI} />
       </div>
     </div>
