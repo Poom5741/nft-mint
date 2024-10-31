@@ -1,10 +1,8 @@
-/** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ["./app/**/*.{js,ts,jsx,tsx}", "./components/**/*.{js,ts,jsx,tsx}", "./utils/**/*.{js,ts,jsx,tsx}"],
   plugins: [require("daisyui")],
   darkTheme: "dark",
   darkMode: ["selector", "[data-theme='dark']"],
-  // DaisyUI theme colors
   daisyui: {
     themes: [
       {
@@ -25,9 +23,7 @@ module.exports = {
           success: "#34EEB6",
           warning: "#FFCF72",
           error: "#FF8863",
-
           "--rounded-btn": "9999rem",
-
           ".tooltip": {
             "--tooltip-tail": "6px",
           },
@@ -41,25 +37,23 @@ module.exports = {
       },
       {
         dark: {
-          primary: "#212638",
+          primary: "#4A90E2", // Slightly brighter blue for contrast
           "primary-content": "#F9FBFF",
-          secondary: "#323f61",
-          "secondary-content": "#F9FBFF",
-          accent: "#4969A6",
+          secondary: "#1F2937", // Dark gray for secondary elements
+          "secondary-content": "#E5E7EB",
+          accent: "#2563EB", // Brighter accent color for important buttons
           "accent-content": "#F9FBFF",
-          neutral: "#F9FBFF",
-          "neutral-content": "#385183",
-          "base-100": "#385183",
-          "base-200": "#2A3655",
-          "base-300": "#212638",
-          "base-content": "#F9FBFF",
-          info: "#385183",
-          success: "#34EEB6",
-          warning: "#FFCF72",
-          error: "#FF8863",
-
-          "--rounded-btn": "9999rem",
-
+          neutral: "#1E293B", // Darker for main content areas
+          "neutral-content": "#9CA3AF",
+          "base-100": "#111827", // Deep dark background
+          "base-200": "#1F2937", // Slightly lighter for layered sections
+          "base-300": "#374151", // Dark gray for panels and cards
+          "base-content": "#D1D5DB", // Light text for readability
+          info: "#3B82F6", // Blue for informational messages
+          success: "#10B981", // Green for success messages
+          warning: "#FBBF24", // Yellow for warnings
+          error: "#EF4444", // Red for errors
+          "--rounded-btn": "8px", // Slightly less rounded for a modern look
           ".tooltip": {
             "--tooltip-tail": "6px",
             "--tooltip-color": "oklch(var(--p))",

@@ -10,17 +10,14 @@ export const MintPreviewCard: React.FC<MintPreviewCardProps> = ({ tokenId, metad
   const [imageUrl, setImageUrl] = useState("");
   const [metadata, setMetadata] = useState<any>(null);
 
-  // Fetch metadata from the provided URI
   useEffect(() => {
     const fetchMetadata = async () => {
       try {
-        // Replace the ipfs:// with your Pinata link format
         const metadataUrl = metadataURI.replace("ipfs://", "https://tomato-academic-dragon-340.mypinata.cloud/ipfs/");
         const response = await fetch(metadataUrl);
         const data = await response.json();
         setMetadata(data);
 
-        // Convert the image IPFS URL to Pinata URL
         const imageUrlFromMetadata = data.image.replace(
           "ipfs://",
           "https://tomato-academic-dragon-340.mypinata.cloud/ipfs/",
@@ -35,29 +32,16 @@ export const MintPreviewCard: React.FC<MintPreviewCardProps> = ({ tokenId, metad
   }, [metadataURI]);
 
   return (
-    <div className="card bg-base-100 shadow-xl w-full lg:w-[330px] flex flex-col justify-between mx-auto lg:mx-0 lg:my-0">
-      <figure className="flex justify-center items-center h-full p-4">
-        {/* Show the image if it's available */}
+    <div className="card bg-base-300 shadow-lg p-4 w-full h-auto text-base-content rounded-lg">
+      <figure className="flex justify-center items-center p-4">
         {imageUrl ? (
-          <Image
-            src={imageUrl}
-            alt={`NFT #${tokenId}`}
-            width={300}
-            height={300}
-            className="rounded-lg object-contain"
-            layout="intrinsic"
-          />
+          <Image src={imageUrl} alt={`NFT #${tokenId}`} width={400} height={400} className="rounded-lg object-cover" />
         ) : (
           <p>Loading image...</p>
         )}
       </figure>
       <div className="card-body text-center">
-        {/* Display other metadata information */}
-        {metadata && (
-          <>
-            <p className="text-lg font-bold">{metadata.name}</p>
-          </>
-        )}
+        {metadata && <p className="text-lg font-bold text-primary-content">{metadata.name}</p>}
       </div>
     </div>
   );
